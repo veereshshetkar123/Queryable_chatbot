@@ -21,16 +21,15 @@
 
     <main class="chat-container">
 
-        <!-- Header -->
         <header class="chat-header">
 
             <div>
-                <span class="eyebrow">AI DATA ASSISTANT</span>
+                <span class="eyebrow">DATABASE ASSISTANT</span>
 
                 <h1>Queryable Chatbot</h1>
 
                 <p>
-                    Explore your MongoDB data using natural language.
+                    Ask questions and explore your data in plain language.
                 </p>
             </div>
 
@@ -41,13 +40,8 @@
                     id="theme-toggle"
                     type="button"
                 >
-                    <span class="theme-icon" aria-hidden="true">
-                        &#9790;
-                    </span>
-
-                    <span class="theme-label">
-                        Light mode
-                    </span>
+                    <span class="theme-icon">&#9790;</span>
+                    <span class="theme-label">Light mode</span>
                 </button>
 
                 <span class="status">
@@ -55,43 +49,12 @@
                     Online
                 </span>
 
-                <button
-                    class="clear-button"
-                    id="clear-button"
-                    type="button"
-                >
-                    Clear
-                </button>
-
             </div>
 
         </header>
 
 
-        <!-- Suggested questions -->
-        <section class="suggestions">
-
-            <span class="suggestions-title">
-                Try asking
-            </span>
-
-            <button class="suggestion-button">
-                Show AI employees in Bangalore
-            </button>
-
-            <button class="suggestion-button">
-                Show HR employees in Bangalore
-            </button>
-
-            <button class="suggestion-button">
-                Show all employees
-            </button>
-
-        </section>
-
-
-        <!-- Chat messages -->
-        <section id="chat-box" aria-live="polite">
+        <section id="chat-box">
 
             <div class="message bot-message">
 
@@ -100,7 +63,7 @@
                 </span>
 
                 <p>
-                    Hello! 👋 Ask me something about your database.
+                    Hello! Ask me something about the database.
                 </p>
 
             </div>
@@ -108,10 +71,9 @@
         </section>
 
 
-        <!-- Input -->
         <form
             class="input-area"
-            id="chat-form"
+            onsubmit="sendQuestion(event)"
         >
 
             <label
@@ -124,7 +86,7 @@
             <input
                 type="text"
                 id="question"
-                placeholder="Ask something about your data..."
+                placeholder="Ask a question about your data..."
                 autocomplete="off"
             >
 
@@ -132,8 +94,7 @@
                 id="send-button"
                 type="submit"
             >
-                Send
-                <span aria-hidden="true">&#8594;</span>
+                Send →
             </button>
 
         </form>
@@ -146,22 +107,9 @@
         const themeToggle =
             document.getElementById("theme-toggle");
 
-        const clearButton =
-            document.getElementById("clear-button");
+        const savedTheme =
+            localStorage.getItem("queryable-theme");
 
-        const chatForm =
-            document.getElementById("chat-form");
-
-        const questionInput =
-            document.getElementById("question");
-
-        const chatBox =
-            document.getElementById("chat-box");
-
-
-        // -------------------------
-        // Theme
-        // -------------------------
 
         function applyTheme(theme) {
 
@@ -177,22 +125,16 @@
                     : "Switch to light mode"
             );
 
-            themeToggle.querySelector(
-                ".theme-icon"
-            ).innerHTML =
-                lightMode ? "&#9728;" : "&#9790;";
+            themeToggle.querySelector(".theme-icon").textContent =
+                lightMode ? "☀" : "☾";
 
-            themeToggle.querySelector(
-                ".theme-label"
-            ).textContent =
-                lightMode
-                    ? "Dark mode"
-                    : "Light mode";
+            themeToggle.querySelector(".theme-label").textContent =
+                lightMode ? "Dark mode" : "Light mode";
         }
 
 
         applyTheme(
-            localStorage.getItem("queryable-theme") === "light"
+            savedTheme === "light"
                 ? "light"
                 : "dark"
         );
@@ -213,187 +155,69 @@
                     "queryable-theme",
                     nextTheme
                 );
+
             }
         );
 
 
-        // -------------------------
-        // Add message safely
-        // -------------------------
+        async function sendQuestion(event) {
 
-        function addMessage(
-            sender,
-            text,
-            messageType
-        ) {
+            event.preventDefault();
 
-            const message =
-                document.createElement("div");
+            const questionInput =
+                document.getElementById("question");
 
-            message.className =
-                "message " + messageType;
+            const chatBox =
+                document.getElementById("chat-box");
 
-            const label =
-                document.createElement("span");
+            const question =
+                questionInput.value.trim();
 
-            label.className =
-                "message-label";
+            if (!question) {
+                return;
+            }
 
-            label.textContent =
-                sender;
 
-            const paragraph =
-                document.createElement("p");
+            chatBox.innerHTML +=
+                '<div class="message user-message">' +
+                    '<span class="message-label">You</span>' +
+                    '<p>' + question + '</p>' +
+                '</div>';
 
-            paragraph.textContent =
-                text;
 
-            message.appendChild(label);
-            message.appendChild(paragraph);
+            questionInput.value = "";
 
-            chatBox.appendChild(message);
+
+            const response = await fetch(
+                "/ask",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        question: question
+                    })
+                }
+            );
+
+
+            const data =
+                await response.json();
+
+
+            chatBox.innerHTML +=
+                '<div class="message bot-message">' +
+                    '<span class="message-label">Assistant</span>' +
+                    '<p>' + data.answer + '</p>' +
+                '</div>';
+
 
             chatBox.scrollTop =
                 chatBox.scrollHeight;
         }
-
-
-        // -------------------------
-        // Suggested questions
-        // -------------------------
-
-        document
-            .querySelectorAll(".suggestion-button")
-            .forEach(function (button) {
-
-                button.addEventListener(
-                    "click",
-                    function () {
-
-                        questionInput.value =
-                            button.textContent;
-
-                        questionInput.focus();
-                    }
-                );
-
-            });
-
-
-        // -------------------------
-        // Clear chat
-        // -------------------------
-
-        clearButton.addEventListener(
-            "click",
-            function () {
-
-                chatBox.innerHTML = "";
-
-                addMessage(
-                    "Assistant",
-                    "Hello! 👋 Ask me something about your database.",
-                    "bot-message"
-                );
-
-            }
-        );
-
-
-        // -------------------------
-        // Send question
-        // -------------------------
-
-        chatForm.addEventListener(
-            "submit",
-            async function (event) {
-
-                event.preventDefault();
-
-                const question =
-                    questionInput.value.trim();
-
-                if (!question) {
-                    return;
-                }
-
-
-                addMessage(
-                    "You",
-                    question,
-                    "user-message"
-                );
-
-                questionInput.value = "";
-
-
-                // Loading message
-
-                const loadingMessage =
-                    document.createElement("div");
-
-                loadingMessage.className =
-                    "message bot-message loading-message";
-
-                loadingMessage.innerHTML =
-                    '<span class="message-label">Assistant</span>' +
-                    '<p>Thinking...</p>';
-
-                chatBox.appendChild(
-                    loadingMessage
-                );
-
-                chatBox.scrollTop =
-                    chatBox.scrollHeight;
-
-
-                try {
-
-                    const response =
-                        await fetch("/ask", {
-
-                            method: "POST",
-
-                            headers: {
-                                "Content-Type":
-                                    "application/json"
-                            },
-
-                            body: JSON.stringify({
-                                question: question
-                            })
-
-                        });
-
-
-                    const data =
-                        await response.json();
-
-
-                    loadingMessage.remove();
-
-
-                    addMessage(
-                        "Assistant",
-                        data.answer,
-                        "bot-message"
-                    );
-
-
-                } catch (error) {
-
-                    loadingMessage.remove();
-
-                    addMessage(
-                        "Assistant",
-                        "Sorry, I could not connect to the chatbot backend.",
-                        "bot-message"
-                    );
-
-                }
-
-            }
-        );
 
     </script>
 
