@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queryable Chatbot</title>
+    <script>
+        document.documentElement.dataset.theme = localStorage.getItem("queryable-theme") === "light" ? "light" : "dark";
+    </script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <main class="chat-container">
+        <header class="chat-header">
+            <div>
+                <span class="eyebrow">DATABASE ASSISTANT</span>
+                <h1>Queryable Chatbot</h1>
+                <p>Ask questions and explore your data in plain language.</p>
+            </div>
+            <div class="header-actions">
+                <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to light mode" aria-pressed="false">
+                    <span class="theme-icon" aria-hidden="true">&#9790;</span>
+                    <span class="theme-label">Light mode</span>
+                </button>
+                <span class="status"><span class="status-dot"></span>Online</span>
+            </div>
+        </header>
+
+        <section id="chat-box" aria-live="polite">
+            <div class="message bot-message">
+                <span class="message-label">Assistant</span>
+                <p>Hello! Ask me something about the database.</p>
+            </div>
+        </section>
+
+        <form class="input-area" onsubmit="sendQuestion(event)">
+            <label class="sr-only" for="question">Ask a question</label>
+            <input type="text" id="question" placeholder="Ask a question about your data..." autocomplete="off">
+            <button id="send-button" type="submit">Send <span aria-hidden="true">&#8594;</span></button>
+        </form>
+    </main>
+
+    <script>
+        const themeToggle = document.getElementById("theme-toggle");
+        const savedTheme = localStorage.getItem("queryable-theme");
+
+        function applyTheme(theme) {
+            const lightMode = theme === "light";
+            document.documentElement.dataset.theme = lightMode ? "light" : "dark";
+            themeToggle.setAttribute("aria-pressed", String(lightMode));
+            themeToggle.setAttribute("aria-label", lightMode ? "Switch to dark mode" : "Switch to light mode");
+            themeToggle.querySelector(".theme-icon").innerHTML = lightMode ? "&#9728;" : "&#9790;";
+            themeToggle.querySelector(".theme-label").textContent = lightMode ? "Dark mode" : "Light mode";
+        }
+
+        applyTheme(savedTheme === "light" ? "light" : "dark");
+
+        themeToggle.addEventListener("click", function () {
+            const nextTheme = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+            applyTheme(nextTheme);
+            localStorage.setItem("queryable-theme", nextTheme);
+        });
+
+        async function sendQuestion(event) {
+            event.preventDefault();
+
+            const questionInput = document.getElementById("question");
+            const question = questionInput.value.trim();
+            if (!question) return;
+
+            document.getElementById("chat-box").innerHTML +=
+                '<div class="message user-message"><span class="message-label">You</span><p>' + question + '</p></div>';
+            questionInput.value = "";
+
+            const response = await fetch("/ask", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    question: question
+                })
+            });
+
+            const data = await response.json();
+
+            document.getElementById("chat-box").innerHTML +=
+                '<div class="message bot-message"><span class="message-label">Assistant</span><p>' + data.answer + '</p></div>';
+            document.getElementById("chat-box").scrollTop = document.getElementById("chat-box").scrollHeight;
+        }
+
+    </script>
+
+</body>
+</html>
