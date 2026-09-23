@@ -1,6 +1,5 @@
 from database_tool import run_database_query
 
-
 query = {
     "collection": "employees",
     "filters": {
@@ -8,6 +7,7 @@ query = {
         "city": "bangalore"
     },
     "fields": [
+        "employee_id",
         "employee_name",
         "department",
         "city",
@@ -18,5 +18,5 @@ query = {
 
 result = run_database_query(query)
 
-print("database result:")
+print("employees result:")
 print(result)
