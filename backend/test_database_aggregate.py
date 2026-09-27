@@ -2,7 +2,6 @@ from schema_discovery import get_schema
 
 
 def validate_collection(collection_name):
-
     schema = get_schema()
 
     if collection_name in schema:
@@ -12,7 +11,6 @@ def validate_collection(collection_name):
 
 
 def validate_fields(collection_name, fields):
-
     schema = get_schema()
 
     if collection_name not in schema:
@@ -21,7 +19,6 @@ def validate_fields(collection_name, fields):
     available_fields = schema[collection_name]
 
     for field in fields:
-
         if field not in available_fields:
             return False
 
@@ -29,7 +26,6 @@ def validate_fields(collection_name, fields):
 
 
 def validate_filters(collection_name, filters):
-
     schema = get_schema()
 
     if collection_name not in schema:
@@ -38,7 +34,6 @@ def validate_filters(collection_name, filters):
     available_fields = schema[collection_name]
 
     for field in filters:
-
         if field not in available_fields:
             return False
 
@@ -46,7 +41,6 @@ def validate_filters(collection_name, filters):
 
 
 def validate_operation(operation):
-
     allowed_operations = [
         "find",
         "count",
@@ -61,8 +55,8 @@ def validate_operation(operation):
 
 def validate_query(query):
 
-    collection = query.get("collection")
-    operation = query.get("operation")
+    collection = query["collection"]
+    operation = query["operation"]
 
     if not validate_collection(collection):
         return False
@@ -70,7 +64,25 @@ def validate_query(query):
     if not validate_operation(operation):
         return False
 
-    if operation == "aggregate":
+    if operation == "find":
+
+        filters = query.get("filters", {})
+        fields = query.get("fields", [])
+
+        if not validate_filters(collection, filters):
+            return False
+
+        if not validate_fields(collection, fields):
+            return False
+
+    elif operation == "count":
+
+        filters = query.get("filters", {})
+
+        if not validate_filters(collection, filters):
+            return False
+
+    elif operation == "aggregate":
 
         pipeline = query.get("pipeline", [])
 
@@ -79,16 +91,5 @@ def validate_query(query):
 
         if len(pipeline) == 0:
             return False
-
-        return True
-
-    filters = query.get("filters", {})
-    fields = query.get("fields", [])
-
-    if not validate_filters(collection, filters):
-        return False
-
-    if not validate_fields(collection, fields):
-        return False
 
     return True

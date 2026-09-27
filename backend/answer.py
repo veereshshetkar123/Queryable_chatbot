@@ -1,4 +1,4 @@
-from llm import ask_gemini
+from gemini_rest import ask_gemini
 
 
 def generate_answer(question, database_result):

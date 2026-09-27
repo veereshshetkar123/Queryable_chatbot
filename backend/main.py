@@ -3,11 +3,16 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from queryable_agent import run_agent
+from langchain_agent import run_langchain_agent
+
 
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory="backend/static"), name="static")
+app.mount(
+    "/static",
+    StaticFiles(directory="backend/static"),
+    name="static"
+)
 
 
 class QuestionRequest(BaseModel):
@@ -21,7 +26,7 @@ def home():
 
 @app.post("/ask")
 def ask_question(request: QuestionRequest):
-    answer = run_agent(request.question)
+    answer = run_langchain_agent(request.question)
 
     return {
         "answer": answer

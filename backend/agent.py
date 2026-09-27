@@ -1,5 +1,7 @@
+import json
+
 from schema_discovery import get_schema
-from llm import ask_gemini
+from gemini_rest import ask_gemini
 
 
 query_schema = {
@@ -13,14 +15,7 @@ query_schema = {
         },
         "filters": {
             "type": "object",
-            "properties": {
-                "department": {
-                    "type": "string"
-                },
-                "city": {
-                    "type": "string"
-                }
-            }
+            "properties": {}
         },
         "fields": {
             "type": "array",
@@ -45,36 +40,59 @@ def understand_question(question):
 You are a database query assistant.
 
 MongoDB database schema:
+
 {schema}
 
 User question:
+
 {question}
 
 Create a MongoDB read query based only on the available
 collections and fields in the schema.
 
 Rules:
+
+- Use only collections that exist in the schema.
 - Use only fields that exist in the schema.
 - Do not invent field names.
-- Use operation "find".
-- If the user mentions a condition such as department or city,
-  put that condition inside filters.
-- Do not leave filters empty when the user has given a condition.
+- Use operation "find" for normal lookup questions.
+- Use operation "count" when the user asks how many records there are.
+- If the user gives a condition, put it inside filters.
 - Use the user's requested values in the filters.
-- For fields, use only fields that actually exist in the schema.
-- Return only the required structured JSON.
+- Return ONLY valid JSON.
+- Do not add markdown.
+- Do not add explanations.
+
+Return exactly this structure:
+
+{{
+    "collection": "collection_name",
+    "operation": "find",
+    "filters": {{}},
+    "fields": []
+}}
 """
 
-    return ask_gemini(
-        prompt,
-        response_schema=query_schema
-    )
+    response = ask_gemini(prompt)
+
+    response = response.strip()
+
+    if response.startswith("```"):
+        response = response.replace("```json", "")
+        response = response.replace("```", "")
+        response = response.strip()
+
+    try:
+        query = json.loads(response)
+    except json.JSONDecodeError:
+        raise ValueError("Gemini returned invalid JSON")
+
+    return json.dumps(query)
 
 
 if __name__ == "__main__":
-    question = "show ai employees in bangalore"
+    question = "show customers"
 
     result = understand_question(question)
 
-    print("generated query:")
     print(result)
