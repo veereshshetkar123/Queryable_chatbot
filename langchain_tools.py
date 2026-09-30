@@ -2,8 +2,8 @@ import json
 
 from langchain_core.tools import tool
 
-from database_tool import run_database_query
-from validator import validate_query
+from backend.database_tool import run_database_query
+from backend.validator import validate_query
 
 
 @tool

@@ -1,4 +1,4 @@
-from schema_discovery import get_schema
+from backend.schema_discovery import get_schema
 
 
 def validate_collection(collection_name):

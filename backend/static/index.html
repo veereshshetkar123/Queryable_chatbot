@@ -1,226 +1,894 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Queryable Chatbot</title>
 
-    <script>
-        document.documentElement.dataset.theme =
-            localStorage.getItem("queryable-theme") === "light"
-                ? "light"
-                : "dark";
-    </script>
-
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/style.css?v=chatbot-v4">
 </head>
 
 <body>
 
-    <main class="chat-container">
+<div class="app">
 
-        <header class="chat-header">
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-logo">Q</div>
 
             <div>
-                <span class="eyebrow">DATABASE ASSISTANT</span>
+                <div class="brand-name">Queryable Chatbot</div>
+                <div class="brand-subtitle">DATA WORKSPACE</div>
+            </div>
+        </div>
 
-                <h1>Queryable Chatbot</h1>
+        <button class="new-chat" type="button" data-new-chat>
+            <span>＋</span>
+            <span>New Chat</span>
+        </button>
 
-                <p>
+        <div class="sidebar-section">
+
+            <div class="section-label">WORKSPACE</div>
+
+            <button class="sidebar-item active" type="button" data-view="chat" aria-current="page">
+                <span>◉</span>
+                Chat
+            </button>
+
+            <button class="sidebar-item" type="button" data-view="history">
+                <span>◷</span>
+                Chat History
+            </button>
+
+            <button class="sidebar-item" type="button" data-view="sources">
+                <span>▣</span>
+                Data Sources
+            </button>
+
+            <button class="sidebar-item" type="button" data-view="analytics">
+                <span>▥</span>
+                Analytics
+            </button>
+
+        </div>
+
+        <div class="sidebar-section">
+
+            <div class="section-label">SYSTEM</div>
+
+            <button class="sidebar-item" type="button" data-view="settings">
+                <span>⚙</span>
+                Settings
+            </button>
+
+        </div>
+
+        <div class="sidebar-bottom">
+
+            <div class="mongo-card">
+
+                <div class="mongo-icon">◆</div>
+
+                <div>
+                    <div class="mongo-title">MongoDB</div>
+
+                    <div class="mongo-status">
+                        <span></span>
+                        Connected
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- HEADER -->
+        <header class="header">
+
+            <div>
+                <div class="header-label">
+                    QUERYABLE CHATBOT
+                </div>
+
+                <h1 id="page-title">Queryable Chatbot</h1>
+
+                <p id="page-description">
                     Ask questions and explore your data in plain language.
                 </p>
             </div>
 
-            <div class="header-actions">
+            <div class="header-right">
+
+                <div class="online">
+                    <span></span>
+                    Online
+                </div>
 
                 <button
-                    class="theme-toggle"
-                    id="theme-toggle"
+                    class="theme-button"
+                    id="theme-button"
                     type="button"
+                    aria-label="Switch to light mode"
+                    title="Switch to light mode"
                 >
-                    <span class="theme-icon">&#9790;</span>
-                    <span class="theme-label">Light mode</span>
+                    ☾
                 </button>
 
-                <span class="status">
-                    <span class="status-dot"></span>
-                    Online
-                </span>
+                <div class="profile">Q</div>
 
             </div>
 
         </header>
 
 
-        <section id="chat-box">
+        <!-- WORKSPACE -->
+        <div class="workspace">
 
-            <div class="message bot-message">
+            <!-- CHAT -->
+            <section class="chat-panel">
 
-                <span class="message-label">
-                    Assistant
-                </span>
+                <div class="chat-top">
 
-                <p>
-                    Hello! Ask me something about the database.
-                </p>
+                    <div class="assistant-icon">
+
+                        <div class="mini-robot">
+                            <span></span>
+                            <span></span>
+                        </div>
+
+                    </div>
+
+                    <div>
+
+                        <div class="assistant-name">
+                            Queryable Chatbot
+                        </div>
+
+                        <div class="assistant-status">
+                            Powered by your data
+                        </div>
+
+                    </div>
+
+                    <div class="chat-live">
+                        ● LIVE
+                    </div>
+
+                </div>
+
+
+                <div class="chat-box" id="chat-box">
+
+                    <div class="welcome" id="welcome">
+
+                        <!-- LARGE ROBOT -->
+                        <div class="hero-robot">
+
+                            <div class="orbit orbit-one"></div>
+                            <div class="orbit orbit-two"></div>
+
+                            <div class="robot-antenna"></div>
+
+                            <div class="robot-head">
+
+                                <div class="robot-ear left"></div>
+                                <div class="robot-ear right"></div>
+
+                                <div class="robot-screen">
+
+                                    <div class="robot-eye"></div>
+                                    <div class="robot-eye"></div>
+
+                                </div>
+
+                                <div class="robot-mouth"></div>
+
+                            </div>
+
+                            <div class="robot-body"></div>
+
+                        </div>
+
+
+                        <div class="welcome-title">
+                            Welcome back 👋
+                        </div>
+
+                        <div class="welcome-text">
+                            Ask me anything about your MongoDB data.
+                            I'll query your database and explain the results.
+                        </div>
+
+
+                        <div class="quick-actions">
+
+                            <button type="button" data-question="How many customers are there?">
+                                <span>♟</span>
+                                How many customers?
+                            </button>
+
+                            <button type="button" data-question="What is the total revenue?">
+                                <span>▥</span>
+                                Total revenue?
+                            </button>
+
+                            <button type="button" data-question="Which product generated the highest revenue?">
+                                <span>◇</span>
+                                Top product?
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- INPUT -->
+                <form
+                    class="input-area"
+                    id="question-form"
+                >
+
+                    <div class="input-box">
+
+                        <div class="input-symbol">✦</div>
+
+                        <input
+                            id="question"
+                            type="text"
+                            autocomplete="off"
+                            placeholder="Ask your data anything..."
+                        >
+
+                        <button
+                            id="send-button"
+                            type="submit"
+                        >
+                            <span>Ask</span>
+                            →
+                        </button>
+
+                    </div>
+
+                    <div class="input-hint">
+                        ◈ Queryable can analyze data from your connected MongoDB database.
+                    </div>
+
+                </form>
+
+            </section>
+
+
+            <!-- RIGHT SIDEBAR -->
+            <aside class="right-sidebar">
+
+
+                <!-- DATASETS -->
+                <div class="side-card">
+
+                    <div class="side-title">
+                        <span class="title-icon">▣</span>
+                        Available Datasets
+                    </div>
+
+                    <div class="dataset-list">
+
+                        <div class="dataset">
+                            <div class="dataset-left">
+                                <span class="dataset-dot blue"></span>
+                                customers
+                            </div>
+                            <span>300 ›</span>
+                        </div>
+
+                        <div class="dataset">
+                            <div class="dataset-left">
+                                <span class="dataset-dot green"></span>
+                                products
+                            </div>
+                            <span>50 ›</span>
+                        </div>
+
+                        <div class="dataset">
+                            <div class="dataset-left">
+                                <span class="dataset-dot purple"></span>
+                                orders
+                            </div>
+                            <span>1,000 ›</span>
+                        </div>
+
+                        <div class="dataset">
+                            <div class="dataset-left">
+                                <span class="dataset-dot orange"></span>
+                                order_items
+                            </div>
+                            <span>2,000 ›</span>
+                        </div>
+
+                        <div class="dataset">
+                            <div class="dataset-left">
+                                <span class="dataset-dot pink"></span>
+                                sales_cleaned
+                            </div>
+                            <span>1,625 ›</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SAMPLE QUESTIONS -->
+                <div class="side-card">
+
+                    <div class="side-title">
+                        <span class="title-icon">💡</span>
+                        Sample Questions
+                    </div>
+
+                    <div class="sample-list">
+
+                        <button type="button" data-question="How many customers are there?">
+                            How many customers are there?
+                            <span>›</span>
+                        </button>
+
+                        <button type="button" data-question="What is the total revenue?">
+                            What is the total revenue?
+                            <span>›</span>
+                        </button>
+
+                        <button type="button" data-question="Which product generated the highest revenue?">
+                            Which product generated the highest revenue?
+                            <span>›</span>
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PIPELINE -->
+                <div class="side-card">
+
+                    <div class="side-title">
+                        <span class="title-icon">◉</span>
+                        AI Pipeline
+                    </div>
+
+                    <div class="pipeline">
+
+                        <div>
+                            <span class="pipeline-dot">◈</span>
+                            <span>LangChain Agent</span>
+                        </div>
+
+                        <div>
+                            <span class="pipeline-dot">◆</span>
+                            <span>OpenRouter</span>
+                        </div>
+
+                        <div>
+                            <span class="pipeline-dot">▣</span>
+                            <span>MongoDB</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SUMMARY -->
+                <div class="side-card database-summary">
+
+                    <div class="summary-icon">
+                        ◈
+                    </div>
+
+                    <div class="summary-number">
+                        5
+                    </div>
+
+                    <div>
+                        <div class="summary-title">
+                            Connected Collections
+                        </div>
+
+                        <div class="summary-text">
+                            Ready for natural language queries
+                        </div>
+                    </div>
+
+                </div>
+
+            </aside>
+
+        </div>
+
+        <section class="utility-view" id="utility-view" hidden aria-live="polite"></section>
+
+
+        <!-- FLOATING ROBOT -->
+        <div class="floating-robot">
+
+            <div class="floating-robot-head">
+
+                <div class="floating-eyes">
+                    <span></span>
+                    <span></span>
+                </div>
 
             </div>
 
-        </section>
+            <div class="robot-glow"></div>
 
-
-        <form
-            class="input-area"
-            onsubmit="sendQuestion(event)"
-        >
-
-            <label
-                class="sr-only"
-                for="question"
-            >
-                Ask a question
-            </label>
-
-            <input
-                type="text"
-                id="question"
-                placeholder="Ask a question about your data..."
-                autocomplete="off"
-            >
-
-            <button
-                id="send-button"
-                type="submit"
-            >
-                Send →
-            </button>
-
-        </form>
+        </div>
 
     </main>
 
-
-    <script>
-
-        const themeToggle =
-            document.getElementById("theme-toggle");
-
-        const savedTheme =
-            localStorage.getItem("queryable-theme");
+</div>
 
 
-        function applyTheme(theme) {
+<script>
 
-            const lightMode = theme === "light";
+const DATASETS = [
+    { name: "customers", count: 300 },
+    { name: "products", count: 50 },
+    { name: "orders", count: 1000 },
+    { name: "order_items", count: 2000 },
+    { name: "sales_cleaned", count: 1625 }
+];
 
-            document.documentElement.dataset.theme =
-                lightMode ? "light" : "dark";
+const STORAGE_KEY = "queryable-chatbot-history";
+const THEME_KEY = "queryable-chatbot-theme";
+const VIEW_CONTENT = {
+    chat: ["Queryable Chatbot", "Ask questions and explore your data in plain language."],
+    history: ["Chat History", "Return to a conversation saved in this browser."],
+    sources: ["Data Sources", "Collections currently listed in this workspace."],
+    analytics: ["Analytics", "A quick view of the collection counts shown for this workspace."],
+    settings: ["Settings", "Choose how Queryable Chatbot looks on this device."]
+};
 
-            themeToggle.setAttribute(
-                "aria-label",
-                lightMode
-                    ? "Switch to dark mode"
-                    : "Switch to light mode"
-            );
+const chatBox = document.getElementById("chat-box");
+const workspace = document.querySelector(".workspace");
+const utilityView = document.getElementById("utility-view");
+const welcomeTemplate = document.getElementById("welcome").cloneNode(true);
+const questionForm = document.getElementById("question-form");
+const questionInput = document.getElementById("question");
+const sendButton = document.getElementById("send-button");
+const themeButton = document.getElementById("theme-button");
+let currentView = "chat";
+let currentSessionId = null;
+let conversation = [];
+let activeRequest = null;
 
-            themeToggle.querySelector(".theme-icon").textContent =
-                lightMode ? "☀" : "☾";
 
-            themeToggle.querySelector(".theme-label").textContent =
-                lightMode ? "Dark mode" : "Light mode";
+function readStorage(key, fallback) {
+    try {
+        const value = localStorage.getItem(key);
+        return value === null ? fallback : value;
+    } catch {
+        return fallback;
+    }
+}
+
+
+function writeStorage(key, value) {
+    try {
+        localStorage.setItem(key, value);
+    } catch {
+        return;
+    }
+}
+
+
+function toggleTheme() {
+    setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+}
+
+
+function setTheme(theme) {
+    const selectedTheme = theme === "light" ? "light" : "dark";
+    document.documentElement.dataset.theme = selectedTheme;
+    writeStorage(THEME_KEY, selectedTheme);
+    themeButton.textContent = selectedTheme === "dark" ? "☀" : "☾";
+    themeButton.title = `Switch to ${selectedTheme === "dark" ? "light" : "dark"} mode`;
+    themeButton.setAttribute("aria-label", themeButton.title);
+    if (currentView === "settings") renderSettingsView();
+}
+
+
+function askSample(question) {
+    setView("chat");
+    questionInput.value = question;
+    questionInput.focus();
+}
+
+
+function newChat() {
+    cancelActiveRequest();
+    currentSessionId = null;
+    conversation = [];
+    questionInput.value = "";
+    renderConversation();
+    setView("chat");
+}
+
+
+async function sendQuestion(event) {
+    event.preventDefault();
+    if (activeRequest) return;
+    const question = questionInput.value.trim();
+    if (!question) {
+        questionInput.focus();
+        return;
+    }
+
+    questionInput.value = "";
+    conversation.push({ role: "user", text: question });
+    currentSessionId = saveSession(currentSessionId, conversation);
+    const submittedConversation = conversation;
+    const submittedSessionId = currentSessionId;
+    const controller = new AbortController();
+    activeRequest = controller;
+    sendButton.disabled = true;
+    sendButton.textContent = "Thinking...";
+    renderConversation(true);
+
+    try {
+        const response = await fetch("/ask", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ question }),
+            signal: controller.signal
+        });
+        if (!response.ok) {
+            throw new Error(`Request failed with status ${response.status}`);
         }
-
-
-        applyTheme(
-            savedTheme === "light"
-                ? "light"
-                : "dark"
-        );
-
-
-        themeToggle.addEventListener(
-            "click",
-            function () {
-
-                const nextTheme =
-                    document.documentElement.dataset.theme === "light"
-                        ? "dark"
-                        : "light";
-
-                applyTheme(nextTheme);
-
-                localStorage.setItem(
-                    "queryable-theme",
-                    nextTheme
-                );
-
-            }
-        );
-
-
-        async function sendQuestion(event) {
-
-            event.preventDefault();
-
-            const questionInput =
-                document.getElementById("question");
-
-            const chatBox =
-                document.getElementById("chat-box");
-
-            const question =
-                questionInput.value.trim();
-
-            if (!question) {
-                return;
-            }
-
-
-            chatBox.innerHTML +=
-                '<div class="message user-message">' +
-                    '<span class="message-label">You</span>' +
-                    '<p>' + question + '</p>' +
-                '</div>';
-
-
-            questionInput.value = "";
-
-
-            const response = await fetch(
-                "/ask",
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        question: question
-                    })
-                }
-            );
-
-
-            const data =
-                await response.json();
-
-
-            chatBox.innerHTML +=
-                '<div class="message bot-message">' +
-                    '<span class="message-label">Assistant</span>' +
-                    '<p>' + data.answer + '</p>' +
-                '</div>';
-
-
-            chatBox.scrollTop =
-                chatBox.scrollHeight;
+        const data = await response.json();
+        const answer = typeof data.answer === "string" && data.answer.trim()
+            ? data.answer
+            : "I couldn't find an answer.";
+        submittedConversation.push({ role: "assistant", text: answer });
+        saveSession(submittedSessionId, submittedConversation);
+    } catch (error) {
+        if (!controller.signal.aborted) {
+            submittedConversation.push({
+                role: "assistant",
+                text: "Sorry, I couldn't connect to the backend.",
+                error: true
+            });
+            saveSession(submittedSessionId, submittedConversation);
         }
+    } finally {
+        if (activeRequest === controller) {
+            activeRequest = null;
+            sendButton.disabled = false;
+            sendButton.innerHTML = "<span>Ask</span> →";
+        }
+        if (conversation === submittedConversation && currentView === "chat") {
+            renderConversation();
+        }
+        if (currentView === "history") renderHistoryView();
+    }
+}
 
-    </script>
+
+function cancelActiveRequest() {
+    if (activeRequest) {
+        activeRequest.abort();
+        activeRequest = null;
+    }
+    sendButton.disabled = false;
+    sendButton.innerHTML = "<span>Ask</span> →";
+}
+
+
+function renderConversation(showTyping = false) {
+    chatBox.replaceChildren();
+    if (!conversation.length) {
+        chatBox.appendChild(welcomeTemplate.cloneNode(true));
+        return;
+    }
+
+    conversation.forEach((message) => chatBox.appendChild(createMessageElement(message)));
+    if (showTyping) {
+        chatBox.appendChild(createMessageElement({ role: "assistant", typing: true }));
+    }
+    scrollChat();
+}
+
+
+function createMessageElement(message) {
+    const element = document.createElement("div");
+    const isUser = message.role === "user";
+    element.className = `message ${isUser ? "user-message" : "bot-message"}${message.error ? " error" : ""}`;
+
+    const label = document.createElement("div");
+    label.className = "message-label";
+    label.textContent = isUser ? "YOU" : "QUERYABLE CHATBOT";
+    element.appendChild(label);
+
+    if (message.typing) {
+        const typing = document.createElement("div");
+        typing.className = "typing";
+        for (let index = 0; index < 3; index += 1) {
+            typing.appendChild(document.createElement("span"));
+        }
+        element.appendChild(typing);
+    } else {
+        const text = document.createElement("div");
+        text.className = "message-text";
+        text.textContent = message.text || "";
+        element.appendChild(text);
+    }
+    return element;
+}
+
+
+function loadSessions() {
+    try {
+        const sessions = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+        return Array.isArray(sessions) ? sessions : [];
+    } catch {
+        return [];
+    }
+}
+
+
+function saveSession(sessionId, messages) {
+    const firstQuestion = messages.find((message) => message.role === "user");
+    if (!firstQuestion) return sessionId;
+
+    const newId = typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random()}`;
+    const id = sessionId || newId;
+    const sessions = loadSessions().filter((session) => session.id !== id);
+    sessions.unshift({
+        id,
+        title: firstQuestion.text,
+        updatedAt: new Date().toISOString(),
+        messages: messages.map((message) => ({
+            role: message.role === "user" ? "user" : "assistant",
+            text: String(message.text || ""),
+            error: Boolean(message.error)
+        }))
+    });
+    writeStorage(STORAGE_KEY, JSON.stringify(sessions.slice(0, 50)));
+    return id;
+}
+
+
+function renderHistoryView() {
+    const sessions = loadSessions().sort((first, second) =>
+        new Date(second.updatedAt) - new Date(first.updatedAt)
+    );
+    const entries = sessions.map((session) => {
+        const question = session.messages?.find((message) => message.role === "user")?.text || session.title || "Untitled chat";
+        const date = session.updatedAt ? new Date(session.updatedAt).toLocaleString() : "Saved conversation";
+        return `
+            <button class="history-entry" type="button" data-session-id="${escapeHtml(session.id)}">
+                <span>
+                    <span class="history-question">${escapeHtml(question)}</span>
+                    <span class="history-meta">${escapeHtml(date)}</span>
+                </span>
+                <span class="history-arrow" aria-hidden="true">›</span>
+            </button>
+        `;
+    }).join("");
+
+    utilityView.innerHTML = `
+        <h2 class="utility-heading">Chat History</h2>
+        <p class="utility-description">Saved conversations stay on this device.</p>
+        ${sessions.length ? `<div class="history-list">${entries}</div>
+            <button class="clear-history" type="button" data-clear-history>Clear history</button>`
+            : '<div class="empty-state">Your conversations will appear here after your first question.</div>'}
+    `;
+}
+
+
+function renderSourcesView() {
+    const datasets = [
+        ["customers", "300"],
+        ["products", "50"],
+        ["orders", "1,000"],
+        ["order_items", "2,000"],
+        ["sales_cleaned", "1,625"]
+    ];
+    const cards = datasets.map(([name, count]) => `
+        <article class="utility-card">
+            <h3>${name}</h3>
+            <p>Collection listed in the current workspace overview.</p>
+            <strong class="source-count">${count}</strong>
+            <p>reported records</p>
+            <button class="view-action" type="button" data-question="How many ${name} are there?">Ask about this collection</button>
+        </article>
+    `).join("");
+
+    utilityView.innerHTML = `
+        <h2 class="utility-heading">Data Sources</h2>
+        <p class="utility-description">These counts are workspace metadata; the chatbot queries the connected database when you ask a question.</p>
+        <div class="utility-grid">${cards}</div>
+    `;
+}
+
+
+function renderAnalyticsView() {
+    const datasets = [
+        ["customers", 300],
+        ["products", 50],
+        ["orders", 1000],
+        ["order_items", 2000],
+        ["sales_cleaned", 1625]
+    ];
+    const total = datasets.reduce((sum, [, count]) => sum + count, 0);
+    const cards = datasets.map(([name, count]) => {
+        const percentage = Math.round((count / total) * 100);
+        return `
+            <article class="utility-card">
+                <h3>${name}</h3>
+                <p>${count.toLocaleString()} reported records · ${percentage}% of listed rows</p>
+                <div class="analytics-bar" aria-label="${percentage}% of listed rows">
+                    <span style="width: ${percentage}%"></span>
+                </div>
+            </article>
+        `;
+    }).join("");
+
+    utilityView.innerHTML = `
+        <h2 class="utility-heading">Analytics</h2>
+        <p class="utility-description">${datasets.length} listed collections · ${total.toLocaleString()} reported records combined. Counts are workspace metadata, not a live query.</p>
+        <div class="utility-grid">${cards}</div>
+        <button class="view-action" type="button" data-question="Summarize the available collections and their reported record counts.">Ask for a data summary</button>
+    `;
+}
+
+
+function renderSettingsView() {
+    const theme = document.documentElement.dataset.theme;
+    utilityView.innerHTML = `
+        <h2 class="utility-heading">Settings</h2>
+        <p class="utility-description">Preferences are saved in this browser.</p>
+        <div class="utility-card settings-row">
+            <div class="settings-copy">
+                <strong>Appearance</strong>
+                <span>Choose the dark cinematic palette or a brighter workspace.</span>
+            </div>
+            <div class="theme-options" aria-label="Choose appearance">
+                <button type="button" data-theme-choice="dark" aria-pressed="${theme === "dark"}">Dark</button>
+                <button type="button" data-theme-choice="light" aria-pressed="${theme === "light"}">Bright</button>
+            </div>
+        </div>
+    `;
+}
+
+
+function renderUtilityView(view) {
+    if (view === "history") renderHistoryView();
+    if (view === "sources") renderSourcesView();
+    if (view === "analytics") renderAnalyticsView();
+    if (view === "settings") renderSettingsView();
+}
+
+
+function setView(view) {
+    const viewCopy = {
+        chat: ["Queryable Chatbot", "Ask questions and explore your data in plain language."],
+        history: ["Chat History", "Return to a conversation saved in this browser."],
+        sources: ["Data Sources", "Collections currently listed in this workspace."],
+        analytics: ["Analytics", "A quick view of the collection counts shown for this workspace."],
+        settings: ["Settings", "Choose how Queryable Chatbot looks on this device."]
+    };
+    if (!viewCopy[view]) return;
+
+    currentView = view;
+    workspace.hidden = view !== "chat";
+    utilityView.hidden = view === "chat";
+    document.getElementById("page-title").textContent = viewCopy[view][0];
+    document.getElementById("page-description").textContent = viewCopy[view][1];
+    document.querySelectorAll(".sidebar-item[data-view]").forEach((button) => {
+        const active = button.dataset.view === view;
+        button.classList.toggle("active", active);
+        if (active) button.setAttribute("aria-current", "page");
+        else button.removeAttribute("aria-current");
+    });
+
+    if (view === "chat") renderConversation();
+    else renderUtilityView(view);
+}
+
+
+function openSession(sessionId) {
+    const session = loadSessions().find((item) => item.id === sessionId);
+    if (!session) return;
+
+    cancelActiveRequest();
+    currentSessionId = session.id;
+    conversation = Array.isArray(session.messages) ? session.messages.map((message) => ({
+        role: message.role === "user" ? "user" : "assistant",
+        text: String(message.text || ""),
+        error: Boolean(message.error)
+    })) : [];
+    setView("chat");
+}
+
+
+document.addEventListener("click", (event) => {
+    if (!(event.target instanceof Element)) return;
+    const target = event.target;
+
+    if (target.closest("[data-new-chat]")) {
+        newChat();
+        return;
+    }
+    const viewButton = target.closest("[data-view]");
+    if (viewButton) {
+        setView(viewButton.dataset.view);
+        return;
+    }
+    const questionButton = target.closest("[data-question]");
+    if (questionButton) {
+        askSample(questionButton.dataset.question);
+        return;
+    }
+    const sessionButton = target.closest("[data-session-id]");
+    if (sessionButton) {
+        openSession(sessionButton.dataset.sessionId);
+        return;
+    }
+    if (target.closest("[data-clear-history]")) {
+        if (window.confirm("Clear all conversations saved in this browser?")) {
+            writeStorage(STORAGE_KEY, "[]");
+            renderHistoryView();
+        }
+        return;
+    }
+    const themeChoice = target.closest("[data-theme-choice]");
+    if (themeChoice) setTheme(themeChoice.dataset.themeChoice);
+});
+
+
+themeButton.addEventListener("click", toggleTheme);
+questionForm.addEventListener("submit", sendQuestion);
+
+
+function scrollChat() {
+
+    const chatBox =
+        document.getElementById("chat-box");
+
+    chatBox.scrollTop =
+        chatBox.scrollHeight;
+}
+
+
+function escapeHtml(value) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent = value;
+
+    return div.innerHTML;
+}
+
+
+setTheme(readStorage(THEME_KEY, "dark"));
+setView("chat");
+
+</script>
 
 </body>
-
 </html>

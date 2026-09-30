@@ -12,7 +12,73 @@ llm = ChatOpenRouter(
 )
 
 
+def is_database_question(question):
+    router_prompt = f"""
+Decide whether the user's question requires information from the MongoDB database.
+
+User question:
+{question}
+
+Return ONLY one word:
+DATABASE
+or
+GENERAL
+
+DATABASE = the question asks about customers, products, orders, sales,
+revenue, quantities, or other information stored in the database.
+
+GENERAL = normal questions, explanations, definitions, coding questions,
+general knowledge, greetings, or other questions that do not require
+the MongoDB database.
+"""
+
+    response = llm.invoke(router_prompt).content
+
+    if isinstance(response, list):
+        response = "".join(
+            item.get("text", "")
+            for item in response
+            if isinstance(item, dict)
+        )
+
+    return response.strip().upper().startswith("DATABASE")
+
+
 def run_langchain_agent(question):
+
+    # --------------------------------------------------
+    # STEP 1: Decide whether this is a database question
+    # --------------------------------------------------
+
+    if not is_database_question(question):
+
+        general_prompt = f"""
+You are a helpful general-purpose AI assistant.
+
+Answer the user's question clearly and naturally.
+
+User question:
+{question}
+
+Give a simple and useful answer.
+Do not invent facts.
+"""
+
+        answer = llm.invoke(general_prompt).content
+
+        if isinstance(answer, list):
+            answer = "".join(
+                item.get("text", "")
+                for item in answer
+                if isinstance(item, dict)
+            )
+
+        return answer
+
+
+    # --------------------------------------------------
+    # STEP 2: Database question
+    # --------------------------------------------------
 
     schema = """
 MongoDB database: queryable_chatbot
@@ -132,12 +198,18 @@ Do not invent collections or fields.
     except json.JSONDecodeError:
         return "The AI did not return a valid database query."
 
-    # Execute the MongoDB query
+    # --------------------------------------------------
+    # STEP 3: Execute MongoDB query
+    # --------------------------------------------------
+
     result = query_mongodb.invoke(
         json.dumps(query_data)
     )
 
-    # Create the final user-friendly answer
+    # --------------------------------------------------
+    # STEP 4: Create final database answer
+    # --------------------------------------------------
+
     answer_prompt = f"""
 You are a database assistant.
 
@@ -147,14 +219,20 @@ User question:
 MongoDB result:
 {result}
 
-Answer the user's question using ONLY the MongoDB result.
+Answer the user's question using the MongoDB result.
 
 Do not invent information.
 
 Give a simple and clear answer.
 """
 
-    # Ask OpenRouter to create the final answer
     answer = llm.invoke(answer_prompt).content
+
+    if isinstance(answer, list):
+        answer = "".join(
+            item.get("text", "")
+            for item in answer
+            if isinstance(item, dict)
+        )
 
     return answer
