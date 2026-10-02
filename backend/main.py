@@ -3,8 +3,8 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from langchain_agent import run_langchain_agent
-from jev_router import route_question
+from backend.langchain_agent import run_langchain_agent
+from backend.jev_router import route_question
 
 
 app = FastAPI()
