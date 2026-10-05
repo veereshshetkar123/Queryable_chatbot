@@ -1,0 +1,420 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  border: 0 solid;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+img,
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+img,
+video {
+  height: auto;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: transparent;
+  cursor: pointer;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: #080e13;
+  color: #f4f8fb;
+}
+
+/* =========================================================
+   OPENUI THREAD HEADER
+   ========================================================= */
+
+.openui-cloud-thread-header
+  .openui-agent-thread-header__title {
+  display: none;
+}
+
+.openui-cloud-thread-header
+  .openui-agent-thread-header__actions {
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: space-between;
+}
+
+/* =========================================================
+   CINEMATIC QUERYABLE CHATBOT
+   ========================================================= */
+
+.cinematic-chatbot {
+  --page-ink: #f4f8fb;
+  --brand-surface: rgba(7, 17, 23, 0.7);
+  --brand-border: rgba(119, 207, 226, 0.2);
+  --brand-muted: rgba(166, 208, 218, 0.7);
+  --grid-line: rgba(135, 195, 213, 0.045);
+  --control-surface: rgba(8, 22, 29, 0.76);
+  --control-hover: rgba(24, 53, 62, 0.92);
+  --control-border: rgba(131, 203, 220, 0.24);
+  --scroll-track: rgba(255, 255, 255, 0.025);
+  --scroll-thumb: rgba(112, 203, 224, 0.3);
+
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 100vh;
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      ellipse at 52% 7%,
+      rgba(22, 158, 190, 0.18),
+      transparent 38%
+    ),
+    radial-gradient(
+      ellipse at 5% 72%,
+      rgba(19, 104, 141, 0.14),
+      transparent 38%
+    ),
+    radial-gradient(
+      ellipse at 96% 66%,
+      rgba(28, 138, 148, 0.1),
+      transparent 35%
+    ),
+    linear-gradient(
+      145deg,
+      #071014 0%,
+      #0b171d 48%,
+      #080e13 100%
+    );
+
+  color: var(--page-ink);
+  transition: background-color 240ms ease, color 240ms ease;
+}
+
+.cinematic-chatbot[data-theme="light"] {
+  --page-ink: #14242a;
+  --brand-surface: rgba(255, 255, 255, 0.76);
+  --brand-border: rgba(37, 102, 116, 0.16);
+  --brand-muted: rgba(59, 94, 102, 0.76);
+  --grid-line: rgba(40, 107, 122, 0.055);
+  --control-surface: rgba(255, 255, 255, 0.82);
+  --control-hover: rgba(224, 243, 242, 0.98);
+  --control-border: rgba(43, 111, 122, 0.2);
+  --scroll-track: rgba(27, 74, 81, 0.035);
+  --scroll-thumb: rgba(38, 128, 139, 0.3);
+
+  background:
+    radial-gradient(ellipse at 53% 5%, rgba(55, 177, 190, 0.19), transparent 39%),
+    radial-gradient(ellipse at 5% 75%, rgba(110, 191, 178, 0.17), transparent 36%),
+    radial-gradient(ellipse at 96% 68%, rgba(239, 185, 112, 0.13), transparent 34%),
+    linear-gradient(145deg, #f6fbf8 0%, #edf5f3 50%, #f8f7f1 100%);
+}
+
+/* =========================================================
+   BACKGROUND ATMOSPHERE
+   ========================================================= */
+
+.cinematic-background {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.cinematic-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+.cinematic-glow-one {
+  width: 520px;
+  height: 520px;
+  top: -260px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(42, 195, 210, 0.13);
+}
+
+.cinematic-glow-two {
+  width: 420px;
+  height: 420px;
+  bottom: -220px;
+  left: 15%;
+  background: rgba(35, 151, 165, 0.1);
+}
+
+/* Subtle technical grid */
+
+.cinematic-grid {
+  position: absolute;
+  inset: 0;
+
+  background-image:
+    linear-gradient(
+      var(--grid-line) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      var(--grid-line) 1px,
+      transparent 1px
+    );
+
+  background-size: 60px 60px;
+
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.8),
+    transparent 90%
+  );
+}
+
+/* =========================================================
+   CINEMATIC BRAND
+   ========================================================= */
+
+.cinematic-brand {
+  position: absolute;
+  top: 24px;
+  left: 30px;
+
+  z-index: 20;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 10px 15px;
+
+  border: 1px solid var(--brand-border);
+  border-radius: 12px;
+
+  background: var(--brand-surface);
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  box-shadow: 0 12px 38px rgba(12, 43, 50, 0.12);
+}
+
+.cinematic-brand-dot {
+  width: 9px;
+  height: 9px;
+
+  border-radius: 50%;
+
+  background: #48d9ff;
+
+  box-shadow:
+    0 0 8px #48d9ff,
+    0 0 18px rgba(72, 217, 255, 0.7);
+
+  animation: cinematic-pulse 2.2s ease-in-out infinite;
+}
+
+.cinematic-brand-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--page-ink);
+}
+
+.cinematic-brand-subtitle {
+  margin-top: 2px;
+
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+
+  color: var(--brand-muted);
+}
+
+.cinematic-theme-toggle {
+  position: absolute;
+  top: 26px;
+  right: 30px;
+  z-index: 20;
+
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+
+  border: 1px solid var(--control-border);
+  border-radius: 12px;
+  background: var(--control-surface);
+  color: var(--page-ink);
+  box-shadow: 0 10px 30px rgba(12, 43, 50, 0.12);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.cinematic-theme-toggle:hover {
+  background: var(--control-hover);
+  transform: translateY(-1px);
+}
+
+.cinematic-theme-toggle:focus-visible {
+  outline: 2px solid #32aaba;
+  outline-offset: 3px;
+}
+
+.cinematic-chatbot[data-theme="light"]::after {
+  box-shadow: inset 0 0 140px rgba(41, 80, 77, 0.045);
+}
+
+/* =========================================================
+   OPENUI INTERFACE SHELL
+   ========================================================= */
+
+.cinematic-interface {
+  position: relative;
+  z-index: 5;
+
+  width: 100%;
+  height: 100vh;
+  min-height: 100vh;
+
+  background: transparent;
+}
+
+/* Make the OpenUI root transparent where possible */
+
+.cinematic-interface > * {
+  background-color: transparent;
+}
+
+/* =========================================================
+   CINEMATIC VIGNETTE
+   ========================================================= */
+
+.cinematic-chatbot::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+  z-index: 10;
+
+  box-shadow:
+    inset 0 0 180px rgba(0, 0, 0, 0.42),
+    inset 0 0 60px rgba(0, 80, 110, 0.08);
+}
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+.cinematic-chatbot ::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+.cinematic-chatbot ::-webkit-scrollbar-track {
+  background: var(--scroll-track);
+}
+
+.cinematic-chatbot ::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border-radius: 10px;
+}
+
+.cinematic-chatbot ::-webkit-scrollbar-thumb:hover {
+  background: rgba(45, 149, 164, 0.56);
+}
+
+/* =========================================================
+   ANIMATION
+   ========================================================= */
+
+@keyframes cinematic-pulse {
+  0%,
+  100% {
+    opacity: 0.65;
+    transform: scale(0.9);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@media (max-width: 640px) {
+  .cinematic-brand {
+    top: 14px;
+    left: 14px;
+    gap: 9px;
+    padding: 8px 11px;
+  }
+
+  .cinematic-brand-title {
+    font-size: 11px;
+  }
+
+  .cinematic-brand-subtitle {
+    font-size: 7px;
+  }
+
+  .cinematic-theme-toggle {
+    top: 14px;
+    right: 14px;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
