@@ -70,11 +70,15 @@ export const queryInspectorRenderer = defineArtifactRenderer<QueryProps>({
   type: "qc_mongodb_query",
   toolName: "query_mongodb",
   parser: ({ args, response }, { isStreaming }) => {
-    const parsedArgs = parseJSON<QueryArgs>(args) ?? {};
-    const result = parseJSON<QueryResult>(response);
+    const stored = parseJSON<QueryResult & { query?: QueryArgs }>(response);
+    // A saved artifact (Artifacts library) has no tool-call args: the backend
+    // keeps the executed query in its content instead (backend/artifacts.py).
+    const parsedArgs = parseJSON<QueryArgs>(args) ?? stored?.query ?? {};
+    const { query: _query, ...result } = stored ?? {};
+    void _query;
     const id = `${parsedArgs.collection ?? "query"}-${JSON.stringify(parsedArgs).length}`;
     return {
-      props: { args: parsedArgs, result, streaming: isStreaming, id },
+      props: { args: parsedArgs, result: stored ? result : null, streaming: isStreaming, id },
       meta: null,
     };
   },

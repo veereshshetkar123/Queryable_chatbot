@@ -2,9 +2,23 @@
 
 import { useEffect } from "react";
 import { AgentInterface, useNav } from "@openuidev/react-ui";
-import { BookOpen, Database, Globe2, Lightbulb, LogOut, Moon, Orbit, Search, Settings, Sun } from "lucide-react";
+import {
+  BookOpen,
+  ChevronDown,
+  Database,
+  Globe2,
+  Lightbulb,
+  LogOut,
+  Moon,
+  Orbit,
+  Search,
+  Settings,
+  ShieldCheck,
+  Sun,
+} from "lucide-react";
 
 import { logout, type SessionUser } from "@/lib/api";
+import { useLocalStorage } from "@/lib/use-browser";
 
 /** Tool pages, each rendered by an <AgentInterface.Route> in cloud-chat.tsx. */
 export const TOOL_ROUTES = {
@@ -15,6 +29,7 @@ export const TOOL_ROUTES = {
   catalog: "catalog",
   prompts: "prompts",
   settings: "settings",
+  admin: "admin",
 } as const;
 
 const TOOLS = [
@@ -41,6 +56,33 @@ export function SettingsButton({ className = "qc-icon-button" }: { className?: s
     >
       <Settings size={15} />
     </button>
+  );
+}
+
+/**
+ * A labelled sidebar group whose items can be folded away; the open/closed
+ * state is remembered per browser. In the collapsed (icon-only) sidebar the
+ * label is hidden and the items always show.
+ */
+function SideSection({ id, label, children }: { id: string; label: string; children: React.ReactNode }) {
+  const [stored, setStored] = useLocalStorage(`queryable-side-${id}`);
+  const open = stored !== "closed";
+  return (
+    <nav className="qc-side-section" aria-label={label} data-open={open}>
+      <button
+        type="button"
+        className="qc-side-label qc-side-label--toggle"
+        aria-expanded={open}
+        onClick={(event) => {
+          event.stopPropagation();
+          setStored(open ? "closed" : "open");
+        }}
+      >
+        {label}
+        <ChevronDown size={12} aria-hidden="true" />
+      </button>
+      <div className="qc-side-section__items">{children}</div>
+    </nav>
   );
 }
 
@@ -92,8 +134,7 @@ export function renderSidebar({
         </div>
       </div>
 
-      <nav className="qc-side-section" aria-label="Tools">
-        <p className="qc-side-label">Tools</p>
+      <SideSection id="tools" label="Tools">
         {TOOLS.map((tool) => (
           <AgentInterface.SidebarItem
             key={tool.path}
@@ -104,7 +145,24 @@ export function renderSidebar({
             {tool.label}
           </AgentInterface.SidebarItem>
         ))}
-      </nav>
+      </SideSection>
+
+      {/* Saved charts, maps and queries from every answer (lib/artifact-storage.ts). */}
+      <SideSection id="artifacts" label="Artifacts">
+        <AgentInterface.ArtifactNav className="qc-side-artifacts" />
+      </SideSection>
+
+      {user?.role === "admin" && (
+        <SideSection id="admin" label="Admin">
+          <AgentInterface.SidebarItem
+            icon={<ShieldCheck size={16} />}
+            path={TOOL_ROUTES.admin}
+            trailing={<span className="qc-side-badge qc-side-badge--admin">Admin</span>}
+          >
+            Admin console
+          </AgentInterface.SidebarItem>
+        </SideSection>
+      )}
 
       <AgentInterface.SidebarContent className="qc-side-recents">
         <AgentInterface.ThreadList />

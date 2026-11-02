@@ -15,6 +15,8 @@ The chatbot turns each question into a **validated, read-only MongoDB query**, r
 - **Smart routing:** Jev (via OpenRouter) decides whether a question needs the database; a LangChain classifier is the fallback.
 - **Rich answers:** streamed OpenUI components, with a query inspector that shows the exact query that ran.
 - **Built-in tools:** insights dashboard, analytics lab, geo explorer, data catalog, usage stats, and voice input.
+- **Artifacts library:** every chart, map, insight set and query an answer produces is saved. Browse and search them from **Artifacts** in the sidebar (Charts & insights · Maps · Queries), or open the current chat's artifacts from the workspace rail on the right.
+- **Admin console:** for `admin` users, a sidebar **Admin console** with workspace KPIs and 14-day activity, user management (add users, change role/plan, disable, reset password, sign out), feedback review, an audit log of admin actions, and service health.
 - **Accounts:** login and sign-up, saved conversations, plans with daily limits, and personal API keys (`qc-...`).
 - **Feedback:** 👍 / 👎 on every answer, stored with the query and trace ID for debugging.
 - **Production basics:** Docker Compose, health probes, request logs, GitHub Actions CI.
@@ -116,6 +118,8 @@ To create a user from the command line instead (for example an admin):
 ```bash
 python -m scripts.create_user admin --role admin
 ```
+
+Admins see **Admin console** in the sidebar, where they can add more users. To fill the Artifacts library from conversations saved before it existed, run `python -m scripts.backfill_artifacts` once (`--dry-run` shows what it would add).
 
 ---
 
@@ -222,6 +226,8 @@ The interactive docs are at **<http://127.0.0.1:8000/docs>** while the backend r
 | `/api/threads/*` | Saved conversations |
 | `/api/account/*` | Plan, usage, personal API keys |
 | `/api/feedback/*` | Answer ratings |
+| `/api/artifacts/*` | Saved artifacts (list, search, open, rename, delete) |
+| `/api/admin/*` | Admin console: overview, users, audit log (admins only) |
 | `/api/insights/overview`, `/api/analytics/lab`, `/api/geo/*`, `/api/catalog` | Dashboard tools |
 | `/api/livez`, `/api/readyz`, `/api/health` | Health probes |
 
@@ -267,6 +273,8 @@ Queryable-chatbot/
 │   ├── guardrails.py        input checks, PII redaction
 │   ├── openui_engine.py     OpenUI answer generation
 │   ├── auth.py, account.py, threads.py, feedback.py
+│   ├── artifacts.py         saved charts/maps/queries (Artifacts library)
+│   ├── admin.py             admin console API
 │   ├── insights.py, analytics.py, hr_analytics.py, geo.py
 │   └── openui/              OpenUI component library + system prompt
 ├── openui_test/             Next.js frontend

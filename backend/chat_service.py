@@ -18,7 +18,7 @@ import json
 import time
 import uuid
 
-from backend import account, langchain_agent
+from backend import account, artifacts, langchain_agent
 from backend.analytics import answer_analysis
 from backend.config import settings
 from backend.geo import build_geo_payload
@@ -143,6 +143,8 @@ class ChatRun:
         self.messages = messages
         self.model = model if model in model_options() else None
         self.generated = []
+        # (tool name, args, result) of every tool call, saved as artifacts.
+        self.tool_results = []
         self.question = message_text(messages[-1]) if messages else ""
         self.trace = None
         self.text_message_id = None
@@ -155,6 +157,7 @@ class ChatRun:
         call_id = f"call_{uuid.uuid4().hex[:12]}"
         args_text = json.dumps(args, default=str, ensure_ascii=False)
         result_text = json.dumps(result, default=str, ensure_ascii=False)
+        self.tool_results.append((name, args, result))
 
         self.generated.append(
             {
@@ -254,6 +257,16 @@ class ChatRun:
                     )
                 except Exception:  # noqa: BLE001
                     logger.exception("could not save thread")
+                try:
+                    await asyncio.to_thread(
+                        artifacts.save_run_artifacts,
+                        self.user["username"],
+                        self.thread_id,
+                        self.question,
+                        self.tool_results,
+                    )
+                except Exception:  # noqa: BLE001
+                    logger.exception("could not save artifacts")
             summary = finish_trace(self.trace)
             try:
                 await asyncio.to_thread(

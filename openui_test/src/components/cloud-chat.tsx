@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { LogOut, Moon, Sun } from "lucide-react";
+import { BarChart3, Database, Globe2, LogOut, Moon, Sun } from "lucide-react";
 import {
   AgentInterface,
   ModelSwitcher,
@@ -12,12 +12,14 @@ import {
   useSystemThemeMode,
   type ModelOption,
 } from "@openuidev/react-ui";
+import type { ArtifactCategory } from "@openuidev/react-headless";
 import { openuiChatLibrary } from "@openuidev/react-ui/genui-lib";
 
 import { dataInsightsRenderer, geoMapRenderer, visualAnalysisRenderer } from "@/components/analysis-renderers";
 import { QueryableAssistantMessage } from "@/components/assistant-message";
 import { renderSidebar, SettingsButton, TOOL_ROUTES } from "@/components/app-sidebar";
 import { artifactRenderers as queryRenderers } from "@/components/query-inspector";
+import { AdminPage } from "@/components/tools/admin-page";
 import { AnalyticsLabPage } from "@/components/tools/analytics-lab-page";
 import { CatalogPage } from "@/components/tools/catalog-page";
 import { GeoExplorerPage } from "@/components/tools/geo-explorer-page";
@@ -29,6 +31,7 @@ import { Backdrop } from "@/components/backdrop";
 import { VoiceDock } from "@/components/voice-dock";
 import { useLocalStorage } from "@/lib/use-browser";
 import { authFetch, fetchCurrentUser, logout, type SessionUser } from "@/lib/api";
+import { artifactStorage } from "@/lib/artifact-storage";
 import { queryableDarkTheme, queryableLightTheme } from "@/lib/theme";
 import { BRAND_LOGOS, PROMPT_TEMPLATES, STARTERS } from "@/lib/starters";
 
@@ -36,6 +39,15 @@ const MODEL_STORAGE_KEY = "queryable-chat-model";
 
 // Captured once at mount by ChatProvider, so it must be a stable module constant.
 const artifactRenderers = [...queryRenderers, geoMapRenderer, visualAnalysisRenderer, dataInsightsRenderer];
+// Sidebar "Artifacts" library: each category is one nav item and one section
+// of the per-conversation workspace rail. Types match the renderers above and
+// backend/artifacts.py TOOL_TYPES.
+const artifactCategories: ArtifactCategory[] = [
+  { name: "Charts & insights", filter: { type: ["qc_visual_analysis", "qc_data_insights"] }, icon: <BarChart3 size={16} /> },
+  { name: "Maps", filter: { type: ["qc_geo_map"] }, icon: <Globe2 size={16} /> },
+  { name: "Queries", filter: { type: ["qc_mongodb_query"] }, icon: <Database size={16} /> },
+];
+const labels = { defaultCategory: "Artifacts", workspaceToggle: "Artifacts in this chat" };
 // Answers with a thumbs up / down bar (see assistant-message.tsx).
 const components = { AssistantMessage: QueryableAssistantMessage };
 
@@ -123,7 +135,10 @@ export default function CloudChat() {
     [selectedModel],
   );
 
-  const storage = useMemo(() => restStorage({ baseUrl: "/api/threads", fetch: authFetch }), []);
+  const storage = useMemo(
+    () => ({ ...restStorage({ baseUrl: "/api/threads", fetch: authFetch }), artifact: artifactStorage() }),
+    [],
+  );
 
   const logoPath = mode === "dark" ? BRAND_LOGOS.DARK : BRAND_LOGOS.LIGHT;
 
@@ -177,6 +192,8 @@ export default function CloudChat() {
           componentLibrary={openuiChatLibrary}
           components={components}
           artifactRenderers={artifactRenderers}
+          artifactCategories={artifactCategories}
+          labels={labels}
           logoUrl={logoPath}
           agentName="Queryable Chatbot"
           theme={{ mode, darkTheme: queryableDarkTheme, lightTheme: queryableLightTheme }}
@@ -202,6 +219,9 @@ export default function CloudChat() {
           </AgentInterface.Route>
           <AgentInterface.Route path={TOOL_ROUTES.prompts}>
             <PromptsPage />
+          </AgentInterface.Route>
+          <AgentInterface.Route path={TOOL_ROUTES.admin}>
+            <AdminPage isAdmin={user?.role === "admin"} />
           </AgentInterface.Route>
           <AgentInterface.Route path={TOOL_ROUTES.settings}>
             <SettingsPage

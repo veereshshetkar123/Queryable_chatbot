@@ -19,6 +19,7 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
+from backend.artifacts import delete_for_thread
 from backend.auth import require_user
 from backend.db import db
 
@@ -144,4 +145,5 @@ def update_thread(thread_id: str, payload: UpdateThread, user=Depends(require_us
 def delete_thread(thread_id: str, user=Depends(require_user)):
     get_owned(thread_id, user["username"])
     threads.delete_one({"_id": thread_id, "username": user["username"]})
+    delete_for_thread(thread_id, user["username"])
     return {"ok": True}
