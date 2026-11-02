@@ -5,6 +5,7 @@ import "./queryable.css";
 import "./tools.css";
 import "./settings.css";
 import "./lab.css";
+import "./admin.css";
 
 const sans = Manrope({
   subsets: ["latin"],

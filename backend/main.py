@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from pymongo.errors import PyMongoError
 
-from backend import account, auth, feedback, threads
+from backend import account, admin, artifacts, auth, feedback, threads
 from backend.auth import require_user
 from backend.chat_service import ChatRun, model_options, with_heartbeat
 from backend.config import settings
@@ -48,6 +48,8 @@ app.include_router(auth.router)
 app.include_router(threads.router)
 app.include_router(account.router)
 app.include_router(feedback.router)
+app.include_router(artifacts.router)
+app.include_router(admin.router)
 
 executor = ThreadPoolExecutor(max_workers=4)
 
@@ -62,6 +64,7 @@ def startup():
         threads.ensure_indexes()
         account.ensure_indexes()
         feedback.ensure_indexes()
+        artifacts.ensure_indexes()
     except Exception as error:  # MongoDB down: the API still starts
         logger.warning("MongoDB index setup skipped: %s", error)
 

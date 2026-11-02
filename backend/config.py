@@ -136,5 +136,6 @@ SEPARATE_DATASET_COLLECTIONS = frozenset({IBM_HR_COLLECTION})
 # Collections that belong to the application itself. They are never exposed
 # to schema discovery, query generation or the query validator.
 INTERNAL_COLLECTIONS = frozenset(
-    {"app_users", "app_sessions", "chat_threads", "audit_log", "app_api_keys", "app_usage", "app_feedback"}
+    {"app_users", "app_sessions", "chat_threads", "audit_log", "app_api_keys", "app_usage", "app_feedback",
+     "app_artifacts"}
 )
