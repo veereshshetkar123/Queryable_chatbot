@@ -10,7 +10,9 @@ import {
   Lightbulb,
   LogOut,
   Moon,
+  Network,
   Orbit,
+  Plug,
   Search,
   Settings,
   ShieldCheck,
@@ -30,14 +32,23 @@ export const TOOL_ROUTES = {
   prompts: "prompts",
   settings: "settings",
   admin: "admin",
+  agents: "agents",
+  integrations: "integrations",
 } as const;
 
 const TOOLS = [
   { path: TOOL_ROUTES.lab, label: "Analytics lab", icon: <Orbit size={16} />, badge: "New" },
   { path: TOOL_ROUTES.insights, label: "Insights studio", icon: <Lightbulb size={16} /> },
   { path: TOOL_ROUTES.geo, label: "Geo explorer", icon: <Globe2 size={16} />, badge: "New" },
+];
+
+/** Admin-only pages; users get these later (see the user view on the roadmap). */
+const ADMIN_TOOLS = [
+  { path: TOOL_ROUTES.admin, label: "Admin console", icon: <ShieldCheck size={16} /> },
   { path: TOOL_ROUTES.catalog, label: "Data catalog", icon: <Database size={16} /> },
   { path: TOOL_ROUTES.prompts, label: "Prompt library", icon: <BookOpen size={16} /> },
+  { path: TOOL_ROUTES.agents, label: "Agent map", icon: <Network size={16} />, badge: "New" },
+  { path: TOOL_ROUTES.integrations, label: "Integrations", icon: <Plug size={16} />, badge: "New" },
 ];
 
 /** Gear button that opens Settings (sidebar footer and mobile header). */
@@ -154,13 +165,16 @@ export function renderSidebar({
 
       {user?.role === "admin" && (
         <SideSection id="admin" label="Admin">
-          <AgentInterface.SidebarItem
-            icon={<ShieldCheck size={16} />}
-            path={TOOL_ROUTES.admin}
-            trailing={<span className="qc-side-badge qc-side-badge--admin">Admin</span>}
-          >
-            Admin console
-          </AgentInterface.SidebarItem>
+          {ADMIN_TOOLS.map((tool) => (
+            <AgentInterface.SidebarItem
+              key={tool.path}
+              icon={tool.icon}
+              path={tool.path}
+              trailing={tool.badge ? <span className="qc-side-badge qc-side-badge--admin">{tool.badge}</span> : undefined}
+            >
+              {tool.label}
+            </AgentInterface.SidebarItem>
+          ))}
         </SideSection>
       )}
 

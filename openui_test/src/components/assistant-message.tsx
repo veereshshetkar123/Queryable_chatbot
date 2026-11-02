@@ -1,9 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { ThumbsDown, ThumbsUp } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { BarChart3, ChevronRight, LayoutPanelLeft, PanelRightClose, ThumbsDown, ThumbsUp } from "lucide-react";
 import { create } from "zustand";
-import { useThread, useThreadList, type AssistantMessage } from "@openuidev/react-ui";
+import {
+  DetailedViewPanel,
+  useDetailedView,
+  useThread,
+  useThreadList,
+  type AssistantMessage,
+} from "@openuidev/react-ui";
 import { openuiChatLibrary } from "@openuidev/react-ui/genui-lib";
 import { BuiltinActionType, Renderer, type ActionEvent } from "@openuidev/react-lang";
 
@@ -285,23 +291,163 @@ export function QueryableAssistantMessage({ message, isStreaming }: { message: A
     [processMessage],
   );
 
+  const shape = useMemo(() => describeResponse(content), [content]);
+
+  const renderer = content ? (
+    <Renderer
+      response={content}
+      library={openuiChatLibrary}
+      isStreaming={isStreaming}
+      onAction={handleAction}
+      onStateUpdate={handleStateUpdate}
+      initialState={initialState}
+    />
+  ) : null;
+
   return (
     <div className="openui-shell-thread-message-assistant openui-shell-thread-message-assistant--without-logo">
       <div className="openui-shell-thread-message-assistant__content">
-        {content ? (
-          <Renderer
-            response={content}
-            library={openuiChatLibrary}
-            isStreaming={isStreaming}
-            onAction={handleAction}
-            onStateUpdate={handleStateUpdate}
-            initialState={initialState}
-          />
-        ) : null}
+        {shape.rich && message.id ? (
+          <ArtifactResponse messageId={message.id} shape={shape} isStreaming={isStreaming}>
+            {renderer}
+          </ArtifactResponse>
+        ) : (
+          renderer
+        )}
         {!isStreaming && content && threadId && message.id ? (
           <FeedbackBar threadId={threadId} messageId={message.id} />
         ) : null}
       </div>
     </div>
+  );
+}
+
+// ------------------------------------------------------------------
+// Artifact-style responses
+// ------------------------------------------------------------------
+
+/**
+ * Like a Claude artifact: an answer with charts, tables or other rich
+ * components shows a short summary and a card in the chat, and the full
+ * response (every component, not just one chart) opens in the side panel.
+ * Plain-text answers stay inline.
+ */
+
+// Components that read as plain chat text. Anything else makes the answer an artifact.
+const PLAIN = new Set([
+  "Card", "CardHeader", "TextContent", "MarkDownRenderer", "Callout", "TextCallout", "Separator", "InlineHeader",
+  "FollowUpBlock", "FollowUpItem", "Text", "BoldText", "Label", "Tag", "TagBlock", "Icon", "IconText", "Buttons", "Button",
+]);
+
+const KIND_LABELS: [RegExp, string][] = [
+  [/Chart$/, "Chart"],
+  [/Table$/, "Table"],
+  [/^(MetricIndicator|OverviewCard)/, "Metrics"],
+  [/^(ListBlock|EntityList|SectionBlock|Steps|Accordion)/, "List"],
+  [/^(Tabs|Carousel)/, "Tabs"],
+  [/^(Form|Input|Select|RadioGroup|CheckBoxGroup|Slider|DatePicker)/, "Form"],
+  [/^CodeBlock/, "Code"],
+  [/^Image/, "Images"],
+];
+
+type ResponseShape = { rich: boolean; title: string; summary: string; kinds: string[] };
+
+function decode(literal: string) {
+  try {
+    return JSON.parse(`"${literal}"`) as string;
+  } catch {
+    return literal;
+  }
+}
+
+function firstString(content: string, components: string) {
+  const match = new RegExp(String.raw`\b(?:${components})\(\s*"((?:[^"\\]|\\.)*)"`).exec(content);
+  return match ? decode(match[1]) : "";
+}
+
+function plainText(markdown: string) {
+  return markdown
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/[#>*_`|]+/g, " ")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+export function describeResponse(content: string): ResponseShape {
+  const used = new Set(Array.from(content.matchAll(/([A-Z][A-Za-z]+)\s*\(/g), (m) => m[1]));
+  const richParts = [...used].filter((name) => !PLAIN.has(name));
+  // Data parts of a chart or table (Series, Col, Slice…) do not get their own label.
+  const kinds = [
+    ...new Set(richParts.map((name) => KIND_LABELS.find(([re]) => re.test(name))?.[1]).filter((k): k is string => !!k)),
+  ];
+  const title = plainText(firstString(content, "CardHeader|InlineHeader")) || "Answer";
+  let summary = plainText(firstString(content, "TextContent|MarkDownRenderer"));
+  if (summary.length > 280) summary = `${summary.slice(0, 277).replace(/\s+\S*$/, "")}…`;
+  return { rich: richParts.length > 0, title, summary, kinds };
+}
+
+function ArtifactResponse({
+  messageId,
+  shape,
+  isStreaming,
+  children,
+}: {
+  messageId: string;
+  shape: ResponseShape;
+  isStreaming: boolean;
+  children: React.ReactNode;
+}) {
+  const viewId = `qc-answer:${messageId}`;
+  const { isActive, open, toggle } = useDetailedView(viewId);
+
+  // Open the panel automatically for an answer that is streaming in now
+  // (not for answers loaded from history), once.
+  const autoOpened = useRef(false);
+  useEffect(() => {
+    if (isStreaming && !autoOpened.current) {
+      autoOpened.current = true;
+      open();
+    }
+  }, [isStreaming, open]);
+
+  return (
+    <>
+      {shape.summary ? <p className="qc-answer-lead">{shape.summary}</p> : null}
+      <button
+        type="button"
+        className="qc-artifact-card"
+        data-active={isActive}
+        aria-expanded={isActive}
+        aria-controls={viewId}
+        onClick={toggle}
+      >
+        <span className="qc-artifact-card__icon" aria-hidden="true">
+          {isStreaming ? <span className="qc-artifact-card__pulse" /> : <BarChart3 size={18} />}
+        </span>
+        <span className="qc-artifact-card__text">
+          <strong>{shape.title}</strong>
+          <span>
+            {isStreaming ? "Building the response…" : shape.kinds.length ? shape.kinds.join(" · ") : "Full response"}
+          </span>
+        </span>
+        <span className="qc-artifact-card__action">
+          {isActive ? (
+            <>
+              <PanelRightClose size={14} /> Close
+            </>
+          ) : (
+            <>
+              <LayoutPanelLeft size={14} /> Open <ChevronRight size={13} />
+            </>
+          )}
+        </span>
+      </button>
+      <DetailedViewPanel viewId={viewId} title={shape.title} className="qc-artifact-panel">
+        <div className="qc-artifact-panel__body" id={viewId}>
+          {children}
+        </div>
+      </DetailedViewPanel>
+    </>
   );
 }

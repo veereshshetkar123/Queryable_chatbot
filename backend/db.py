@@ -28,7 +28,9 @@ def business_collection_names():
     ]
 
     if settings.queryable_collections:
-        allowed = set(settings.queryable_collections)
+        # Datasets an admin uploaded from the Data catalog are always
+        # queryable; the allowlist only narrows the other collections.
+        allowed = set(settings.queryable_collections) | set(db["app_datasets"].distinct("name"))
         names = [name for name in names if name in allowed]
 
     return sorted(names)

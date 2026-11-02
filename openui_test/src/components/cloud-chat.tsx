@@ -19,7 +19,10 @@ import { dataInsightsRenderer, geoMapRenderer, visualAnalysisRenderer } from "@/
 import { QueryableAssistantMessage } from "@/components/assistant-message";
 import { renderSidebar, SettingsButton, TOOL_ROUTES } from "@/components/app-sidebar";
 import { artifactRenderers as queryRenderers } from "@/components/query-inspector";
+import { AdminOnly, ChatFileDrop } from "@/components/admin-only";
 import { AdminPage } from "@/components/tools/admin-page";
+import { AgentMapPage } from "@/components/tools/agent-map-page";
+import { IntegrationsPage } from "@/components/tools/integrations-page";
 import { AnalyticsLabPage } from "@/components/tools/analytics-lab-page";
 import { CatalogPage } from "@/components/tools/catalog-page";
 import { GeoExplorerPage } from "@/components/tools/geo-explorer-page";
@@ -122,6 +125,7 @@ export default function CloudChat() {
   }, []);
 
   const chooseModel = (model: string) => setSavedModel(model);
+  const role = user ? user.role : null;
 
   const llm = useMemo(
     () =>
@@ -215,10 +219,24 @@ export default function CloudChat() {
             <GeoExplorerPage />
           </AgentInterface.Route>
           <AgentInterface.Route path={TOOL_ROUTES.catalog}>
-            <CatalogPage />
+            <AdminOnly role={role}>
+              <CatalogPage />
+            </AdminOnly>
           </AgentInterface.Route>
           <AgentInterface.Route path={TOOL_ROUTES.prompts}>
-            <PromptsPage />
+            <AdminOnly role={role}>
+              <PromptsPage />
+            </AdminOnly>
+          </AgentInterface.Route>
+          <AgentInterface.Route path={TOOL_ROUTES.agents}>
+            <AdminOnly role={role}>
+              <AgentMapPage />
+            </AdminOnly>
+          </AgentInterface.Route>
+          <AgentInterface.Route path={TOOL_ROUTES.integrations}>
+            <AdminOnly role={role}>
+              <IntegrationsPage />
+            </AdminOnly>
           </AgentInterface.Route>
           <AgentInterface.Route path={TOOL_ROUTES.admin}>
             <AdminPage isAdmin={user?.role === "admin"} />
@@ -256,6 +274,7 @@ export default function CloudChat() {
           />
 
           <VoiceDock />
+          <ChatFileDrop enabled={role === "admin"} />
         </AgentInterface>
       </div>
     </div>

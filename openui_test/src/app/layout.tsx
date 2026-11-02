@@ -6,6 +6,7 @@ import "./tools.css";
 import "./settings.css";
 import "./lab.css";
 import "./admin.css";
+import "./workspace.css";
 
 const sans = Manrope({
   subsets: ["latin"],

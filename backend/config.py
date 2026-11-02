@@ -137,5 +137,5 @@ SEPARATE_DATASET_COLLECTIONS = frozenset({IBM_HR_COLLECTION})
 # to schema discovery, query generation or the query validator.
 INTERNAL_COLLECTIONS = frozenset(
     {"app_users", "app_sessions", "chat_threads", "audit_log", "app_api_keys", "app_usage", "app_feedback",
-     "app_artifacts"}
+     "app_artifacts", "app_datasets"}
 )

@@ -11,14 +11,12 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from pymongo.errors import PyMongoError
 
-from backend import account, admin, artifacts, auth, feedback, threads
+from backend import account, admin, agents, artifacts, auth, data_catalog, feedback, threads
 from backend.auth import require_user
 from backend.chat_service import ChatRun, model_options, with_heartbeat
 from backend.config import settings
 from backend.db import db, ping
-from backend.guardrails import redact_pii
 from backend import analytics, hr_analytics, insights
-from backend.schema_discovery import get_schema
 from backend.langchain_agent import run_langchain_agent
 from backend.jev_router import route_question
 from backend.observability import logger, metrics_snapshot
@@ -50,6 +48,8 @@ app.include_router(account.router)
 app.include_router(feedback.router)
 app.include_router(artifacts.router)
 app.include_router(admin.router)
+app.include_router(agents.router)
+app.include_router(data_catalog.router)
 
 executor = ThreadPoolExecutor(max_workers=4)
 
@@ -65,6 +65,7 @@ def startup():
         account.ensure_indexes()
         feedback.ensure_indexes()
         artifacts.ensure_indexes()
+        data_catalog.ensure_indexes()
     except Exception as error:  # MongoDB down: the API still starts
         logger.warning("MongoDB index setup skipped: %s", error)
 
@@ -266,27 +267,6 @@ async def geo_explore(collection: str, place_field: str, value_field: str | None
     return payload or {"places": [], "insights": [], "continents": []}
 
 
-def _catalog():
-    schema = get_schema()
-    collections = []
-    for name, fields in sorted(schema.items()):
-        collections.append({
-            "name": name,
-            "documents": db[name].estimated_document_count(),
-            "fields": [{"name": field, "type": info.get("type"),
-                        "samples": redact_pii([{field: value} for value in info.get("sample_values", [])])}
-                       for field, info in fields.items()],
-        })
-    return {"collections": collections}
-
-
-@app.get("/api/catalog")
-async def catalog(user=Depends(require_user)):
-    """Collections and fields the chatbot can read (PII-masked samples)."""
-
-    return await asyncio.to_thread(_data_call, _catalog)
-
-
 @app.post("/api/chat")
 async def chat(request: Request, user=Depends(require_user)):
     """OpenUI chat endpoint (AG-UI RunAgentInput in, AG-UI SSE out)."""
@@ -331,6 +311,7 @@ def log_jev_result(question, jev_future, started_at):
 
 
 @app.post("/ask")
+@app.post("/api/ask")  # same endpoint, reachable through the frontend's /api proxy
 async def ask_question(request: QuestionRequest, user=Depends(require_user)):
     """Plain-text answer endpoint kept for scripts and the evaluation runner."""
 

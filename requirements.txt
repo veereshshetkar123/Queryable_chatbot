@@ -10,6 +10,10 @@ requests==2.34.2
 langchain-core==1.6.4
 langchain-openai==1.6.6
 
+# Data catalog uploads (Excel / CSV -> dataset)
+python-multipart==0.0.32
+openpyxl==3.1.5
+
 # Optional: Graphiti + Neo4j context (GRAPHITI_ENABLED=true)
 # graphiti-core==0.30.2
 # neo4j==6.3.1
